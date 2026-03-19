@@ -55,18 +55,21 @@ public class UniformSampleSteps {
     }
 
     //Then
+    @Тогда("выборка содержит ровно {int} элемент")
     @Тогда("выборка содержит ровно {int} элементов")
     public void checkSize(int expected) {
-        assertEquals(expected, sample.getData().size(), "Размер выборки должен быть " + expected);
+        assertEquals(expected, sample.getData().size(),
+                "Размер выборки должен быть " + expected);
     }
 
-    @Тогда("минимальное значение выборки не больше {double}")
+
+    @Тогда("максимальное значение выборки не больше {double}")
     public void checkMax(double expectedMax) {
         double actualMax = sample.max();
-        assertTrue(actualMax == expectedMax, "Максимум " + actualMax + " должен быть не больше " + expectedMax);
+        assertTrue(actualMax <= expectedMax, "Максимум " + actualMax + " должен быть не больше " + expectedMax);
     }
 
-    @Тогда("максимальное значение выборки не меньше {double}")
+    @Тогда("минимальное значение выборки не меньше {double}")
     public void checkMin(double expectedMin) {
         double actualMin = sample.min();
         assertTrue(actualMin >= expectedMin, "Минимум " + actualMin + " должен быть не меньше " + expectedMin);
@@ -79,7 +82,7 @@ public class UniformSampleSteps {
         assertEquals(expected, actualMean, delta, "Среднее " + actualMean + " должно быть близко к " + expected);
     }
 
-    @Тогда("генерация завершается с ошибкой {string}")
+    @Тогда("генерация равномерной выборки завершается с ошибкой {string}")
     public void checkException(String expectedMessage) {
         assertNotNull(thrownException, "Ожидалось исключение с сообщением: " + expectedMessage);
         assertTrue(thrownException.getMessage().contains(expectedMessage), "Сообщение об ошибке должно содержать: "

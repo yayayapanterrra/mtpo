@@ -130,6 +130,12 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+
         <plugins>
             <!-- ==================== Maven Compiler ==================== -->
             <plugin>
@@ -158,6 +164,11 @@
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         -Dnet.bytebuddy.experimental=true
                     </argLine>
+                    <properties>
+                        <configurationParameters>
+                            cucumber.junit-platform.naming-strategy=long
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
 

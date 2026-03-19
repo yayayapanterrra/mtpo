@@ -11,7 +11,7 @@ public class NormalSample extends Sample {
     private double meanVal;
     private double stddevVal;
 
-    private static final Random random = new Random();
+    private static final Random random = new Random(42);
 
     public NormalSample() {
         super();

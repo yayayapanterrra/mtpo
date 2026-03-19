@@ -1,5 +1,7 @@
 package bdd;
 
+import io.cucumber.java.PendingException;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.ru.*;
 import algorithms.LoopStatisticsAlgorithm;
 import algorithms.StreamStatisticsAlgorithm;
@@ -153,7 +155,6 @@ public class StatisticsSteps {
     public void measureAllStatsTime(String algorithmName){
         StatisticsAlgorithm algo = resolveAlgorithm(algorithmName);
         long start = System.currentTimeMillis();
-        loopResult = algo.min(data);
         double max = algo.max(data);
         double mean = algo.mean(data);
         double median = algo.median(data);
@@ -170,5 +171,122 @@ public class StatisticsSteps {
             streamResult = mean;
         }
     }
+
+    @Когда("измеряется время вычисления среднего алгоритмом {string}")
+    public void measureMeanTime(String algorithmName){
+        StatisticsAlgorithm algo = resolveAlgorithm(algorithmName);
+        long start = System.currentTimeMillis();
+        double result = algo.mean(data);
+        long elapsed = System.currentTimeMillis() - start;
+
+        if (algorithmName.contains("Loop")){
+            loopTimeMs = elapsed;
+            loopResult = result;
+        }else {
+            streamTimeMs = elapsed;
+            streamResult = result;
+        }
+    }
+
+    // Then
+
+    @Тогда("результаты минимума совпадают с точностью {double}")
+    public void checkMinEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Минимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты максимума совпадают с точностью {double}")
+    public void checkMaxEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты среднего совпадают с точностью {double}")
+    public void checkMeanEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты медианы совпадают с точностью {double}")
+    public void checkMedianEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты дисперсии совпадают с точностью {double}")
+    public void checkVarianceEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты асимметрии совпадают с точностью {double}")
+    public void checkSkewnessEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    @Тогда("результаты эксцесса совпадают с точностью {double}")
+    public void checkKurtosisEquals(double delta){
+        assertEquals(loopResult, streamResult, delta, "Максимум: Loop = " + loopResult +
+                " Stream = " + streamResult);
+    }
+
+    //Then результат среднего равен 0.0 с точностью 0.0001
+    @Тогда("результат среднего равен {double} с точностью {double}")
+    public void checkMeanValue(double expected, double delta){
+        assertEquals(expected, loopResult, delta, "Среднее Loop = " + loopResult +
+                " должно быть равно " + expected);
+        assertEquals(expected, streamResult, delta, "Среднее Stream = " + streamResult +
+                " должно быть равно " + expected);
+    }
+
+    @Тогда("вычисление завершается с исключением RuntimeException")
+    public void checkRuntimeException(){
+        assertNotNull(thrownException, "Ожидалось исключение RuntimeException");
+        assertInstanceOf(RuntimeException.class, thrownException, "Исключение должно быть RuntimeException");
+    }
+
+    @Тогда("время выполнения Loop алгоритма не превышает {int} мс")
+    public void checkLoopTimeLimit(int limitMs) {
+        assertTrue(loopTimeMs<=limitMs,
+                "Loop алгоритм: " + loopTimeMs + " мс превышает лимит " + limitMs + " мс");
+    }
+
+    @Тогда("время выполнения Stream алгоритма не превышает {long} мс")
+    public void checkStreamTimeLimit(long limitMs) {
+        assertTrue(loopTimeMs<=limitMs,
+                "Stream алгоритм: " + loopTimeMs + " мс превышает лимит " + limitMs + " мс");
+    }
+
+    @Тогда("время выполнения Loop алгоритма зафиксировано")
+    public void logLoopTime(){
+        System.out.printf("[Нагрузка] Loop: размер=%-8d время=%d мс%n", data.size(), loopTimeMs);
+    }
+
+    @Тогда("время выполнения Stream алгоритма зафиксировано")
+    public void logStreamTime(){
+        System.out.printf("[Нагрузка] Stream: размер=%-8d время=%d мс%n", data.size(), streamTimeMs);
+    }
+
+    @Тогда("результаты среднего обоих алгоритмов совпадают с точностью {double}")
+    public void checkBothMeanEquals(double delta){
+        assertEquals(loopResult, streamResult, delta,
+                "Среднее Loop = " + loopResult +"Stream = "+streamResult);
+    }
+
+    @Тогда("результаты обоих алгоритмов совпадают с точностью {double}")
+    public void checkBothResultsEquals(double delta){
+        assertEquals(loopResult, streamResult, delta,
+                "Среднее Loop = " + loopResult +"Stream = "+streamResult);
+    }
+
+    @Тогда("отчет о времени выполнения сохранен для размера {int}")
+    public void savePerformanceReport(int size){
+        System.out.printf("[Отчёт] n=%-8d | Loop: %5d мс | Stream: %5d мс | Разница: %+d мс%n",
+                size, loopTimeMs, streamTimeMs, streamTimeMs - loopTimeMs);
+    }
+
+
 
 }

@@ -1,10 +1,14 @@
 package bdd;
 
+import io.cucumber.java.PendingException;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.ru.*;
 import samples.NormalSample;
 import algorithms.LoopStatisticsAlgorithm;
 
 import java.util.List;
+import io.cucumber.java.Before;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,13 +17,28 @@ public class NormalSampleSteps {
     private NormalSample sample;
     private Exception thrownException;
 
+
+
+    @Before
+    public void setUp() {
+        thrownException = null;
+    }
+
     //Given
 
+
     //Background нормальная выборка создана со средним 0.0 и стандартным отклонением 1.0
-    @Дано("нормальная выборка создана со средним {double} И стандартным отклонением {double}")
+    @Дано("нормальная выборка создана со средним {double} и стандартным отклонением {double}")
     public void createNormalSample(double mean, double stddev) {
         sample = new NormalSample(mean, stddev);
         sample.setAlgorithm(new LoopStatisticsAlgorithm());
+    }
+
+    //When
+
+    @Когда("выборка сгенерирована размером {int} элементов")
+    public void generateSample(int n){
+        sample.generate(n);
     }
 
     //When выборка сгенерирована со средним 5.0 и стандартным отклонением 2.0 размером 500 элементов
@@ -33,16 +52,17 @@ public class NormalSampleSteps {
     //When пользователь пытается создать нормальную выборку со стандартным отклонением -1.0 размером 100 элементов
     @Когда("пользователь пытается создать нормальную выборку со стандартным отклонением {double} размером {int} элементов")
     public void tryGenerateSample(double stddev, int n) {
+        thrownException = null;
         try {
-            sample = new NormalSample();
-            sample.setAlgorithm(new LoopStatisticsAlgorithm());
-            sample.generate(n);
+            NormalSample newSample = new NormalSample(0.0, stddev);
+            newSample.setAlgorithm(new LoopStatisticsAlgorithm());
+            newSample.generate(n);
         } catch (Exception e) {
             thrownException = e;
         }
     }
 
-    //Then выборка яввляется нормально распределенной на уровне значимости {double}
+    //Then выборка является нормально распределенной на уровне значимости {double}
     @Тогда("выборка является нормально распределенной на уровне значимости {double}")
     public void checkNormality(double alpha) {
         assertTrue(sample.isNormal(alpha),
@@ -88,7 +108,7 @@ public class NormalSampleSteps {
         assertEquals(expected, sample.getData().size(), "Размер выборки должен быть " + expected);
     }
 
-    @Тогда("генерация завершается с ошибкой {string}")
+    @Тогда("генерация нормальной выборки завершается с ошибкой {string}")
     public void checkException(String expectedMessage) {
         assertNotNull(thrownException, "Ожидалось исключение с сообщением: " + expectedMessage);
         assertTrue(thrownException.getMessage().contains(expectedMessage),
@@ -96,4 +116,13 @@ public class NormalSampleSteps {
                         "\nФактическое: " + thrownException.getMessage());
     }
 
+
+    @Тогда("стандартное отклонение выборки близко к {double} с точностью {double}")
+    public void checkStddev(double expected, double delta) {
+        double actual = Math.sqrt(sample.variance());
+        assertEquals(
+                expected, actual, delta,
+                "Стандартное отклонение " + actual + " должно быть близко к " + expected
+        );
+    }
 }
