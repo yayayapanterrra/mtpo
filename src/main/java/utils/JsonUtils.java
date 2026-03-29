@@ -25,12 +25,22 @@ public class JsonUtils {
         }
     }
 
+//    public static SampleData loadFromJson(String filename) {
+//        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filename));
+//             JsonReader jsonReader = new JsonReader(reader)) {
+//            return gson.fromJson(jsonReader, SampleData.class);
+//        } catch (RuntimeException e) {
+//            throw new RuntimeException("Не удалось загрузить JSON: файл пуст или имеет неверный формат");
+//        } catch (IOException e) {
+//            throw new RuntimeException("Не удалось загрузить JSON: " + e.getMessage());
+//        }
+//    }
+
+    //Для фазз теста: если filename==null, выбрасывается NullPointerException, который не перехватывается в catch
     public static SampleData loadFromJson(String filename) {
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(filename));
              JsonReader jsonReader = new JsonReader(reader)) {
             return gson.fromJson(jsonReader, SampleData.class);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Не удалось загрузить JSON: файл пуст или имеет неверный формат");
         } catch (IOException e) {
             throw new RuntimeException("Не удалось загрузить JSON: " + e.getMessage());
         }

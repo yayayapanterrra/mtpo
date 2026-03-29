@@ -76,6 +76,7 @@ public class LoopStatisticsAlgorithm implements StatisticsAlgorithm {
         for (double x : data) {
             sum += Math.pow(x - m, 3);
         }
+        //для лр3 нет проверки if (v==0.0) throw new RuntimeException()
         return sum / data.size() / Math.pow(v, 1.5);
     }
 
